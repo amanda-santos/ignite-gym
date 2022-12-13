@@ -7,6 +7,7 @@ import {
 import { NativeBaseProvider } from "native-base";
 
 import { Loading } from "@components/Loading";
+import { SignIn } from "@screens/SignIn";
 import { THEME } from "./src/theme";
 
 export default function App() {
@@ -19,7 +20,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Loading /> : <Loading />}
+      {fontsLoaded ? <SignIn /> : <Loading />}
     </NativeBaseProvider>
   );
 }
