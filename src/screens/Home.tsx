@@ -55,17 +55,17 @@ export const Home = () => {
             {exercises.length}
           </Text>
         </HStack>
-      </VStack>
 
-      <FlatList
-        data={exercises}
-        keyExtractor={(item) => item}
-        renderItem={() => <ExerciseCard />}
-        showsVerticalScrollIndicator={false}
-        _contentContainerStyle={{
-          paddingBottom: 20,
-        }}
-      />
+        <FlatList
+          data={exercises}
+          keyExtractor={(item) => item}
+          renderItem={() => <ExerciseCard />}
+          showsVerticalScrollIndicator={false}
+          _contentContainerStyle={{
+            paddingBottom: 20,
+          }}
+        />
+      </VStack>
     </VStack>
   );
 };
