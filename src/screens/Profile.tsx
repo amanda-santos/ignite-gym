@@ -14,7 +14,7 @@ import { UserPhoto } from "@components/UserPhoto";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
-const PHOTO_SIZE = 33;
+const PHOTO_SIZE = 32;
 
 export const Profile = () => {
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
