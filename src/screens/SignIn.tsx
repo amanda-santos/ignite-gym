@@ -1,17 +1,44 @@
 import { Center, Heading, Image, ScrollView, Text, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import backgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
+
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
+type FormDataProps = {
+  email: string;
+  password: string;
+};
+
+const signInSchema = yup.object({
+  email: yup.string().required("Inform your email").email("Invalid email"),
+  password: yup.string().required("Inform your password"),
+});
+
 export const SignIn = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(signInSchema),
+  });
+
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
-  const handleNewAccount = () => {
+  const handleClickSignUp = () => {
     navigation.navigate("signUp");
+  };
+
+  const handleSignIn = ({ email, password }: FormDataProps) => {
+    console.log({ email, password });
   };
 
   return (
@@ -41,14 +68,36 @@ export const SignIn = () => {
             Access your account
           </Heading>
 
-          <Input
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.email?.message}
+              />
+            )}
           />
-          <Input placeholder="Password" secureTextEntry />
 
-          <Button title="Sign in" />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
+
+          <Button title="Sign in" onPress={handleSubmit(handleSignIn)} />
         </Center>
 
         <Center mt={24}>
@@ -57,7 +106,7 @@ export const SignIn = () => {
           </Text>
         </Center>
 
-        <Button title="Sign up" variant="outline" onPress={handleNewAccount} />
+        <Button title="Sign up" variant="outline" onPress={handleClickSignUp} />
       </VStack>
     </ScrollView>
   );
