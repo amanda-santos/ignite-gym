@@ -1,16 +1,40 @@
 import { Center, Heading, Image, ScrollView, Text, VStack } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
 
 import backgroundImg from "@assets/background.png";
 import LogoSvg from "@assets/logo.svg";
+
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+};
+
 export const SignUp = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>();
+
   const navigation = useNavigation();
 
   const handleGoBack = () => {
     navigation.goBack();
+  };
+
+  const handleSignUp = ({
+    name,
+    email,
+    password,
+    password_confirm,
+  }: FormDataProps) => {
+    console.log({ name, email, password, password_confirm });
   };
 
   return (
@@ -40,17 +64,73 @@ export const SignUp = () => {
             Create your account
           </Heading>
 
-          <Input placeholder="Name" />
-
-          <Input
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="name"
+            rules={{
+              required: "Please inform your name.",
+            }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Name"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+              />
+            )}
           />
 
-          <Input placeholder="Password" secureTextEntry />
+          <Controller
+            control={control}
+            name="email"
+            rules={{
+              required: "Please inform your email.",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email",
+              },
+            }}
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.email?.message}
+              />
+            )}
+          />
 
-          <Button title="Sign up" />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="password_confirm"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Confirm password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                onSubmitEditing={handleSubmit(handleSignUp)}
+                returnKeyType="send"
+              />
+            )}
+          />
+
+          <Button title="Sign up" onPress={handleSubmit(handleSignUp)} />
         </Center>
 
         <Button
