@@ -20,6 +20,14 @@ type FormDataProps = {
 const signUpSchema = yup.object({
   name: yup.string().required("Inform your name"),
   email: yup.string().required("Inform your email").email("Invalid email"),
+  password: yup
+    .string()
+    .required("Inform your password")
+    .min(6, "The password must be at least 6 characters long."),
+  password_confirm: yup
+    .string()
+    .required("Confirm your password.")
+    .oneOf([yup.ref("password"), null], "The passwords don't match"),
 });
 
 export const SignUp = () => {
@@ -110,6 +118,7 @@ export const SignUp = () => {
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
+                errorMessage={errors.password?.message}
               />
             )}
           />
@@ -125,6 +134,7 @@ export const SignUp = () => {
                 value={value}
                 onSubmitEditing={handleSubmit(handleSignUp)}
                 returnKeyType="send"
+                errorMessage={errors.password_confirm?.message}
               />
             )}
           />
@@ -133,9 +143,9 @@ export const SignUp = () => {
         </Center>
 
         <Button
-          title="Go back to sign in page"
+          title="Go back to login page"
           variant="outline"
-          mt={24}
+          mt={12}
           onPress={handleGoBack}
         />
       </VStack>
