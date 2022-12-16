@@ -93,6 +93,8 @@ export const SignIn = () => {
                 onChangeText={onChange}
                 value={value}
                 errorMessage={errors.password?.message}
+                onSubmitEditing={handleSubmit(handleSignIn)}
+                returnKeyType="send"
               />
             )}
           />

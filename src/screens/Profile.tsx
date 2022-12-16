@@ -11,6 +11,9 @@ import {
 } from "native-base";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller } from "react-hook-form";
 
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
@@ -19,12 +22,45 @@ import { Button } from "@components/Button";
 
 const PHOTO_SIZE = 32;
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  previous_password: string;
+  password: string;
+  password_confirm: string;
+};
+
+const profileSchema = yup.object({
+  name: yup.string().required("Inform your name"),
+  previous_password: yup
+    .string()
+    .required("Inform your previous password")
+    .min(6, "The password must be at least 6 characters long."),
+  password: yup
+    .string()
+    .required("Inform your password")
+    .min(6, "The password must be at least 6 characters long."),
+  password_confirm: yup
+    .string()
+    .required("Confirm your password.")
+    .oneOf([yup.ref("password"), null], "The passwords don't match"),
+});
+
 export const Profile = () => {
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(
     "https://github.com/amanda-santos.png"
   );
+
   const toast = useToast();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(profileSchema),
+  });
 
   const handleSelectUserPhoto = async () => {
     try {
@@ -61,6 +97,16 @@ export const Profile = () => {
     }
   };
 
+  const handleSave = ({
+    name,
+    email,
+    previous_password,
+    password,
+    password_confirm,
+  }: FormDataProps) => {
+    console.log({ name, email, previous_password, password, password_confirm });
+  };
+
   return (
     <VStack flex={1}>
       <ScreenHeader title="Profile" />
@@ -95,7 +141,19 @@ export const Profile = () => {
             </Text>
           </TouchableOpacity>
 
-          <Input bg="gray.600" placeholder="Name" />
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Name"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+              />
+            )}
+          />
 
           <Input bg="gray.600" placeholder="Email" isDisabled />
 
@@ -110,21 +168,54 @@ export const Profile = () => {
             Change password
           </Heading>
 
-          <Input
-            bg="gray.600"
-            placeholder="Previous password"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="previous_password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Previous password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.previous_password?.message}
+              />
+            )}
           />
 
-          <Input bg="gray.600" placeholder="New password" secureTextEntry />
-
-          <Input
-            bg="gray.600"
-            placeholder="Confirm your new password"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="New password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+              />
+            )}
           />
 
-          <Button title="Save" mt={4} />
+          <Controller
+            control={control}
+            name="password_confirm"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                bg="gray.600"
+                placeholder="Confirm your new password"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                onSubmitEditing={handleSubmit(handleSave)}
+                returnKeyType="send"
+                errorMessage={errors.password_confirm?.message}
+              />
+            )}
+          />
+
+          <Button title="Save" mt={4} onPress={handleSubmit(handleSave)} />
         </Center>
       </ScrollView>
     </VStack>
