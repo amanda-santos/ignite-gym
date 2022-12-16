@@ -105,6 +105,7 @@ export const Profile = () => {
             mb={2}
             alignSelf="flex-start"
             mt={12}
+            fontFamily="heading"
           >
             Change password
           </Heading>

@@ -38,7 +38,12 @@ export const Exercise = () => {
             <Icon as={Feather} name="arrow-left" color="green.500" size={6} />
           </TouchableOpacity>
 
-          <Heading color="gray.100" fontSize="lg" flexShrink={1}>
+          <Heading
+            color="gray.100"
+            fontSize="lg"
+            flexShrink={1}
+            fontFamily="heading"
+          >
             Puxada frontal
           </Heading>
 
