@@ -10,6 +10,8 @@ import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
+import { api } from "@services/api";
+
 type FormDataProps = {
   name: string;
   email: string;
@@ -46,17 +48,8 @@ export const SignUp = () => {
   };
 
   const handleSignUp = async ({ name, email, password }: FormDataProps) => {
-    const response = await fetch("http://192.168.2.135:3333/users", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
-
-    const data = await response.json();
-    console.log(data);
+    const response = await api.post("/users", { name, email, password });
+    console.log(response.data);
   };
 
   return (
