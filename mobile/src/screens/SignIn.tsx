@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Center,
   Heading,
@@ -41,6 +42,8 @@ export const SignIn = () => {
     resolver: yupResolver(signInSchema),
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { signIn } = useAuth();
 
   const toast = useToast();
@@ -53,6 +56,7 @@ export const SignIn = () => {
 
   const handleSignIn = async ({ email, password }: FormDataProps) => {
     try {
+      setIsLoading(true);
       await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
@@ -66,6 +70,8 @@ export const SignIn = () => {
         placement: "top",
         bgColor: "red.500",
       });
+
+      setIsLoading(false);
     }
   };
 
@@ -78,7 +84,7 @@ export const SignIn = () => {
         <Image
           source={backgroundImg}
           defaultSource={backgroundImg}
-          alt="People working out"
+          alt="Pessoas treinando"
           resizeMode="contain"
           position="absolute"
         />
@@ -87,13 +93,13 @@ export const SignIn = () => {
           <LogoSvg />
 
           <Text color="gray.100" fontSize="sm">
-            Train your mind and body
+            Treine sua mente e o seu corpo
           </Text>
         </Center>
 
         <Center>
           <Heading color="gray.100" fontSize="xl" mb={6} fontFamily="heading">
-            Access your account
+            Acesse sua conta
           </Heading>
 
           <Controller
@@ -101,7 +107,7 @@ export const SignIn = () => {
             name="email"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Email"
+                placeholder="E-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 onChangeText={onChange}
@@ -116,7 +122,7 @@ export const SignIn = () => {
             name="password"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Password"
+                placeholder="Senha"
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
@@ -127,16 +133,24 @@ export const SignIn = () => {
             )}
           />
 
-          <Button title="Sign in" onPress={handleSubmit(handleSignIn)} />
+          <Button
+            title="Acessar"
+            onPress={handleSubmit(handleSignIn)}
+            isLoading={isLoading}
+          />
         </Center>
 
         <Center mt={24}>
           <Text color="gray.100" fontSize="sm" mb={3} fontFamily="body">
-            Still don't have an account?
+            Ainda não possui uma conta?
           </Text>
         </Center>
 
-        <Button title="Sign up" variant="outline" onPress={handleClickSignUp} />
+        <Button
+          title="Criar conta"
+          variant="outline"
+          onPress={handleClickSignUp}
+        />
       </VStack>
     </ScrollView>
   );
