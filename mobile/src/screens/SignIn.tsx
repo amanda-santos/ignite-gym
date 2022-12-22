@@ -10,6 +10,7 @@ import LogoSvg from "@assets/logo.svg";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
+import { useAuth } from "@hooks/useAuth";
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
 type FormDataProps = {
@@ -31,14 +32,16 @@ export const SignIn = () => {
     resolver: yupResolver(signInSchema),
   });
 
+  const { signIn } = useAuth();
+
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
   const handleClickSignUp = () => {
     navigation.navigate("signUp");
   };
 
-  const handleSignIn = ({ email, password }: FormDataProps) => {
-    console.log({ email, password });
+  const handleSignIn = async ({ email, password }: FormDataProps) => {
+    await signIn(email, password);
   };
 
   return (
