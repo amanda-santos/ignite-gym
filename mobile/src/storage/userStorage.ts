@@ -15,3 +15,7 @@ export const get = async () => {
 
   return user;
 };
+
+export const remove = async () => {
+  await AsyncStorage.removeItem(USER_STORAGE);
+};
