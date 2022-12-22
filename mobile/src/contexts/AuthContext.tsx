@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
@@ -18,12 +18,7 @@ export const AuthContext = createContext<AuthContextProps>(
 );
 
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
-  const [user, setUser] = useState({
-    id: "1",
-    name: "Rodrigo",
-    email: "rodrigo@email.com",
-    avatar: "rodrigo.png",
-  });
+  const [user, setUser] = useState<UserDTO>({} as UserDTO);
 
   const signIn: AuthContextProps["signIn"] = async (email, password) => {
     try {
@@ -41,6 +36,18 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       throw error;
     }
   };
+
+  const loadUserData = async () => {
+    const userLogged = await userStorage.get();
+
+    if (userLogged) {
+      setUser(userLogged);
+    }
+  };
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, signIn }}>
