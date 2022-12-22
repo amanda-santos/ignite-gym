@@ -2,6 +2,7 @@ import { createContext, ReactNode, useState } from "react";
 
 import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
+import * as userStorage from "@storage/userStorage";
 
 export type AuthContextProps = {
   user: UserDTO;
@@ -32,6 +33,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
       if (data.user) {
         setUser(data.user);
+        userStorage.save(data.user);
       }
 
       console.log(user);
