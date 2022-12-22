@@ -2,7 +2,9 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 
 import { UserDTO } from "@dtos/UserDTO";
 import { api } from "@services/api";
+
 import * as userStorage from "@storage/userStorage";
+import * as authStorage from "@storage/authStorage";
 
 export type AuthContextProps = {
   user: UserDTO;
@@ -24,15 +26,31 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] =
     useState(true);
 
+  const saveOnStorage = async (userData: UserDTO, token: string) => {
+    try {
+      setIsLoadingUserStorageData(true);
+
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      await userStorage.save(userData);
+      await authStorage.save(token);
+
+      setUser(userData);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoadingUserStorageData(false);
+    }
+  };
+
   const signIn: AuthContextProps["signIn"] = async (email, password) => {
     try {
-      console.log(user);
-
       const { data } = await api.post("/sessions", { email, password });
+      const { user, token } = data;
 
-      if (data.user) {
-        setUser(data.user);
-        userStorage.save(data.user);
+      if (user && token) {
+        setUser(user);
+        saveOnStorage(user, token);
       }
 
       console.log(user);
