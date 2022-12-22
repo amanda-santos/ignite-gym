@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Center,
   Heading,
@@ -19,6 +20,7 @@ import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 
 import { api } from "@services/api";
+import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
 
 type FormDataProps = {
@@ -29,19 +31,21 @@ type FormDataProps = {
 };
 
 const signUpSchema = yup.object({
-  name: yup.string().required("Inform your name"),
-  email: yup.string().required("Inform your email").email("Invalid email"),
+  name: yup.string().required("Informe seu nome"),
+  email: yup.string().required("Informe seu e-mail").email("E-mail inválido"),
   password: yup
     .string()
-    .required("Inform your password")
-    .min(6, "The password must be at least 6 characters long."),
+    .required("Informe sua senha")
+    .min(6, "A senha deve ter no mínimo 6 caracteres."),
   password_confirm: yup
     .string()
-    .required("Confirm your password.")
-    .oneOf([yup.ref("password"), null], "The passwords don't match"),
+    .required("Confirme sua senha.")
+    .oneOf([yup.ref("password"), null], "As senhas não são iguais"),
 });
 
 export const SignUp = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const toast = useToast();
 
   const {
@@ -54,15 +58,21 @@ export const SignUp = () => {
 
   const navigation = useNavigation();
 
+  const { signIn } = useAuth();
+
   const handleGoBack = () => {
     navigation.goBack();
   };
 
   const handleSignUp = async ({ name, email, password }: FormDataProps) => {
     try {
-      const response = await api.post("/users", { name, email, password });
-      console.log(response);
+      setIsLoading(true);
+
+      await api.post("/users", { name, email, password });
+      await signIn(email, password);
     } catch (error) {
+      setIsLoading(false);
+
       const isAppError = error instanceof AppError;
 
       const title = isAppError
@@ -86,7 +96,7 @@ export const SignUp = () => {
         <Image
           source={backgroundImg}
           defaultSource={backgroundImg}
-          alt="People working out"
+          alt="Pessoas treinando"
           resizeMode="contain"
           position="absolute"
         />
@@ -95,13 +105,13 @@ export const SignUp = () => {
           <LogoSvg />
 
           <Text color="gray.100" fontSize="sm">
-            Train your mind and body
+            Treine sua mente e o seu corpo
           </Text>
         </Center>
 
         <Center>
           <Heading color="gray.100" fontSize="xl" mb={6} fontFamily="heading">
-            Create your account
+            Crie sua conta
           </Heading>
 
           <Controller
@@ -109,7 +119,7 @@ export const SignUp = () => {
             name="name"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Name"
+                placeholder="Nome"
                 onChangeText={onChange}
                 value={value}
                 errorMessage={errors.name?.message}
@@ -122,7 +132,7 @@ export const SignUp = () => {
             name="email"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Email"
+                placeholder="E-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 onChangeText={onChange}
@@ -137,7 +147,7 @@ export const SignUp = () => {
             name="password"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Password"
+                placeholder="Senha"
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
@@ -151,7 +161,7 @@ export const SignUp = () => {
             name="password_confirm"
             render={({ field: { onChange, value } }) => (
               <Input
-                placeholder="Confirm password"
+                placeholder="Confirme sua senha"
                 secureTextEntry
                 onChangeText={onChange}
                 value={value}
@@ -162,11 +172,15 @@ export const SignUp = () => {
             )}
           />
 
-          <Button title="Sign up" onPress={handleSubmit(handleSignUp)} />
+          <Button
+            title="Criar e acessar"
+            onPress={handleSubmit(handleSignUp)}
+            isLoading={isLoading}
+          />
         </Center>
 
         <Button
-          title="Go back to login page"
+          title="Voltar para a página de login"
           variant="outline"
           mt={12}
           onPress={handleGoBack}
