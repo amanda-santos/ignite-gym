@@ -69,6 +69,7 @@ export const Profile = () => {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormDataProps>({
     resolver: yupResolver(profileSchema),
@@ -123,6 +124,8 @@ export const Profile = () => {
       await api.put("/users", data);
 
       await updateUserProfile(updatedUser);
+
+      reset();
 
       toast.show({
         title: "Perfil atualizado com sucesso!",
