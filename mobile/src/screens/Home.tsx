@@ -15,7 +15,7 @@ import { ExerciseDTO } from "@dtos/ExerciseDTO";
 
 export const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [groupSelected, setGroupSelected] = useState("costa");
+  const [groupSelected, setGroupSelected] = useState("antebraço");
   const [groups, setGroups] = useState<string[]>([]);
   const [exercises, setExercises] = useState<ExerciseDTO[]>([]);
 
@@ -23,8 +23,8 @@ export const Home = () => {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const handleOpenExerciseDetails = () => {
-    navigation.navigate("exercise");
+  const handleOpenExerciseDetails = (exerciseId: ExerciseDTO["id"]) => {
+    navigation.navigate("exercise", { exerciseId });
   };
 
   const fetchGroups = async () => {
@@ -120,7 +120,10 @@ export const Home = () => {
             data={exercises}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <ExerciseCard onPress={handleOpenExerciseDetails} data={item} />
+              <ExerciseCard
+                onPress={() => handleOpenExerciseDetails(item.id)}
+                data={item}
+              />
             )}
             showsVerticalScrollIndicator={false}
             _contentContainerStyle={{
