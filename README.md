@@ -54,10 +54,25 @@ Technologies used to develop this project:
 - Yup
 - Async Storage
 - Expo
+- Axios
 - Node.js
+- Javascript
 
 ## 🖥 Preview
 
+https://user-images.githubusercontent.com/49074930/209873674-2984be35-8e8c-413d-ae57-713bd929df14.mp4
+
+
+
+https://user-images.githubusercontent.com/49074930/209873680-a896d828-0199-4940-8521-70ae7ed7833f.mp4
+
+
+
+https://user-images.githubusercontent.com/49074930/209873684-741cd162-7fec-45cf-a62f-ece2296eea3c.mp4
+
+
+
+https://user-images.githubusercontent.com/49074930/209873685-aa09049d-6cad-42a8-afd3-4eefc2704f4a.mp4
 
 
 ## ⌨ Getting started
