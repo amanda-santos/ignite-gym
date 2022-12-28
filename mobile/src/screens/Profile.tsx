@@ -15,10 +15,13 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 
+import defaulUserPhotoImg from "@assets/userPhotoDefault.png";
+
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
+
 import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
 import { api } from "@services/api";
@@ -59,9 +62,6 @@ const profileSchema = yup.object({
 export const Profile = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState(
-    "https://github.com/amanda-santos.png"
-  );
 
   const toast = useToast();
 
@@ -97,9 +97,9 @@ export const Profile = () => {
       if (photoUri) {
         const photoInfo = await FileSystem.getInfoAsync(photoUri);
 
-        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 2) {
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
           return toast.show({
-            title: "This image is too big. Choose one up to 2MB.",
+            title: "This image is too big. Choose one up to 5MB.",
             placement: "top",
             bgColor: "red.500",
           });
@@ -117,13 +117,21 @@ export const Profile = () => {
 
         userPhotoUploadForm.append("avatar", photoFile);
 
-        await api.patch("/users/avatar", userPhotoUploadForm, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        const avatarUpdatedResponse = await api.patch(
+          "/users/avatar",
+          userPhotoUploadForm,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        await updateUserProfile({
+          ...user,
+          avatar: avatarUpdatedResponse.data.avatar,
         });
 
-        console.log(photoFile);
         toast.show({
           title: "Foto atualizada!",
           placement: "top",
@@ -193,7 +201,11 @@ export const Profile = () => {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar
+                  ? { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` }
+                  : defaulUserPhotoImg
+              }
               alt="Foto do usuário"
               size={PHOTO_SIZE}
             />
