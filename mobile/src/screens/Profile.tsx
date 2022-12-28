@@ -34,7 +34,7 @@ type FormDataProps = {
 };
 
 const profileSchema = yup.object({
-  name: yup.string().required("Informe o seu nome"),
+  name: yup.string().required("Informe o seu nome").trim(),
   old_password: yup.string(),
   password: yup
     .string()
@@ -92,7 +92,7 @@ export const Profile = () => {
         return;
       }
 
-      const { uri: photoUri } = photoSelected.assets[0];
+      const { uri: photoUri, type: photoType } = photoSelected.assets[0];
 
       if (photoUri) {
         const photoInfo = await FileSystem.getInfoAsync(photoUri);
@@ -105,7 +105,30 @@ export const Profile = () => {
           });
         }
 
-        setUserPhoto(photoUri);
+        const fileExtension = photoUri.split(".").pop();
+
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase(),
+          uri: photoUri,
+          type: `${photoType}/${fileExtension}`,
+        } as any;
+
+        const userPhotoUploadForm = new FormData();
+
+        userPhotoUploadForm.append("avatar", photoFile);
+
+        await api.patch("/users/avatar", userPhotoUploadForm, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        console.log(photoFile);
+        toast.show({
+          title: "Foto atualizada!",
+          placement: "top",
+          bgColor: "green.500",
+        });
       }
     } catch (error) {
       console.log(error);
@@ -121,11 +144,17 @@ export const Profile = () => {
       const updatedUser = user;
       updatedUser.name = data.name;
 
-      await api.put("/users", data);
+      await api.put("/users", {
+        ...data,
+        name: data.name.trim(),
+      });
 
       await updateUserProfile(updatedUser);
 
-      reset();
+      reset({
+        name: data.name,
+        email: data.email,
+      });
 
       toast.show({
         title: "Perfil atualizado com sucesso!",
